@@ -16,9 +16,12 @@
 #include <sys/signal.h>
 #include <sys/wait.h>
 #include<stdlib.h>
+#include<sys/socket.h>
+#include<netinet/in.h>
 
 #include "fon.h"   		/* primitives de la boite a outils */
 
+// Port et IP par défaut pour le serveur a contacter
 #define SERVICE_DEFAUT "1111"
 #define SERVEUR_DEFAUT "127.0.0.1"
 
@@ -68,7 +71,17 @@ void client_appli (char *serveur,char *service)
 /* procedure correspondant au traitement du client de votre application */
 
 {
-  
+	//Lexique 
+	int idSocket;
+	struct sockaddr_in *p_adr_serv;
+
+	// Création d'une socket
+	idSocket = h_socket(AF_INET, SOCK_STREAM);
+	
+	// Connexion au serveur et association IP, Port à la socket
+	adr_socket( service, serveur, SOCK_STREAM, &p_adr_serv);
+
+	h_connect( idSocket, p_adr_serv );
 
 /* a completer .....  */
 
