@@ -92,6 +92,12 @@ void serveur_appli(char *service)
 		idNewSocket = h_accept(idSocket, p_adr_client);
 
 		// 2 : échanger
+		// 2.1 : Lecture de la taille en octets du fichier à recevoir. 
+		char sizeOfFile;
+		// Non fonctionnel
+		h_reads(idNewSocket, &sizeOfFile, 1);
+		printf("Size of file : %c \n", sizeOfFile);
+
 
 		// 3 : Fermer
 		h_close(idNewSocket); 

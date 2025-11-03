@@ -83,6 +83,44 @@ void client_appli (char *serveur,char *service)
 
 	h_connect( idSocket, p_adr_serv );
 
+	/* Envoie de fichier
+		FILE* fichier = fopen(const char *path = chemin d'acces du fichier,
+				 char* mode_ouverture = r,
+				 )
+
+		int fclose(FILE* fichier)
+
+		int read(int fd = fichier,
+				 void *buf,
+				 size_t nbytes)
+	 */
+
+	 FILE* f;
+	 char nomDuFichier[200] ="./fichiers/fichier.txt";
+	 const int BUFFER_SIZE = 2000;
+	 char buffer[BUFFER_SIZE];
+	
+	 f = fopen(nomDuFichier, "r");
+	 if(f==NULL) {
+		perror("Erreur d'ouverture en lecture\n");
+	 } 
+
+	 else {
+	 	char size = 0;
+	 	while ( (size < BUFFER_SIZE) && (fread((buffer+size), 1, 1, f) !=0) ) {
+			size++;
+		};
+
+		h_writes(idSocket, &size, sizeof(size));
+		//Envoi du fichier contenu dans le buffer
+		h_writes(idSocket, buffer, size);
+	 
+		if(fclose(f) != 0) {
+			perror("Erreur lors de la fermeture du fichier\n");
+	 	}
+	};
+	
+
 /* a completer .....  */
 
  }
