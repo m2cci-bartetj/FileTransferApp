@@ -72,7 +72,7 @@ void serveur_appli(char *service)
 	int idSocket;
 	int idNewSocket;
 	struct sockaddr_in *p_adr_serv;
-	struct sockaddr_in *p_adr_client;
+	struct sockaddr_in p_adr_client;
 	int nb_req_att = 5;
 
 	char choice ;						// choice of the procedure to follow
@@ -80,6 +80,8 @@ void serveur_appli(char *service)
 	int size;							// file size in int format
 	char file_name[MAX_NAME];			// Name of the file
 	char * file_content;				// pointer for the content of the file. Allocated dynamically => must be freed
+	int nb_bytes_written, nb_bytes_read;
+	int error_code_serv, error_code_clie;
 
 	/* 1. CONFIGURATION D'UNE CONNEXION*/
 	// 1.1. Création d'une socket
@@ -98,7 +100,7 @@ void serveur_appli(char *service)
 	// 1.4 boucle infinie d'accpetation et de fermeture de connexion
 	while (1) {
 		/* 2. ACCEPTATION D'UNE CONNEXION*/
-		idNewSocket = h_accept(idSocket, p_adr_client);
+		idNewSocket = h_accept(idSocket, &p_adr_client);
 		// /!\ TEST A FAIRE
 
 		/* 3. ECHANGE DE DONNÉES*/
@@ -111,42 +113,41 @@ void serveur_appli(char *service)
 		while ( choice != '3' ) {
 			// Reading recieved choice
 			h_reads(idNewSocket, &choice, 1);
-			sleep(20);
+			//sleep(20);
 
 			// Depending on the choice, different behaviours : 
 			switch(choice) {
 				case '1' : 
 					printf("\n Choix 1: envoyer un fichier client -> serveur.\n");
 					// Récupération d'un fichier : on doit écrire dans un fichier le contenu qui va être envoyé.
-					// On lit FILENAME_MAX octets pour avoir nom du fichier. Il faut toujours envoyer
-					// des string de taille CONNUE dans les deux sens. Sinon, il faut faire une lecture bit à bit
-					// jusqu'à trouver '\0'. Pas très efficace... Meilleur manière ?
+					// Il faut toujours envoyer des string de taille CONNUE dans les deux sens. 
+					// Sinon, il faut faire une lecture bit à bit jusqu'à trouver '\0'. Pas très efficace... Meilleur manière ?
 					
 					// On lit taille du fichier : 
 					h_reads(idNewSocket, file_size, INT_SIZE);
 					size = (int) * file_size;
 					printf("size of file : %d \n", size);
-					//sleep(10);
 					
 					// On lit le nom du ficher
 					h_reads(idNewSocket, file_name, MAX_NAME);
 					printf("Name of file : %s \n", file_name);
-					//sleep(10);
 
 					// On lit le contenu fichier : 
-					//file_content = malloc(size);
-					//h_reads(idNewSocket, file_content, size);
-					//printf("Content of file : %s \n", file_content);
-					//free(file_content);
-					//sleep(10);
+					file_content = malloc(size);
+					h_reads(idNewSocket, file_content, size);
+					printf("file content : \n%s\n", file_content);
 
-					// On créer nom_fichier et met contenu_fichier dedans
-					//WriteFile();
+					// On créé nom_fichier et mettons contenu_fichier dedans
+					// Si il y a une erreur, on ne sort pas.
+					error_code_serv = WriteFile(file_name, size, file_content);
+					free(file_content);
 
-					// Message ok/nok à envoyer au client ?
-
+					// Message ok/nok à envoyer au client ? We suppose error in only in writing in file.
+					//nb_bytes_written = h_writes(idNewSocket, (char *) &error_code_serv, INT_SIZE);
+					//printf("nb bytes written for error %d\n", nb_bytes_written);
+					
 					// closing connection: only for testing.
-					choice = '3';
+					//choice = '3';
 					break;
 				case '2' : 
 					printf("\n Choix 2: envoyer un fichier serveur -> client.\n");
@@ -165,7 +166,7 @@ void serveur_appli(char *service)
 					break;
 				default : 
 					// any other number should not exist. As a precaution, close connection.
-					printf("\n Choix default : ne devrait pas exister. \n");
+					printf("\n Choix default %c : ne devrait pas exister. \n", choice);
 					printf("On choisi de fermer la connection.\n \n");
 					choice = '3';
 					break;

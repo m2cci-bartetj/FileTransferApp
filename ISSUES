@@ -1,0 +1,27 @@
+
+1. Error handling : client side, no exit from connection when exit from file handling error. NOT GOOD. 
+ We should have  in CheckError() the possibility of changing the choice (and perhaps sending the choice)
+ in order to close connection properly.
+
+2. File handling : at the moment, we store the full file in a single go. NOT GOOD. If the file is heavy,
+ then that would mean having a file_content variable quite sizable, and enough to eat too much memory. Same
+ would happen on the server's side. Solution : send the file content by pieces (preferably of multiples of 1448
+ bytes to avoid un-necessary padding), and read and store by pieces. This requires :
+        - a ReadFile() function with input parameter the size of the block to read + position of lecture.
+        - a seperate SizeFile() function to get the size of the file seperatly from the reading
+        - a WriteFile() function with input parameter the size of the block to write, and the writing options
+            ( wb only at the start to squash any existing file, then ab to add content at the end.)
+
+3. Error handling : at the moment, only errors on file handling. NOT GOOD. We need error checks at the start
+of each sent/recieved messages.
+ 
+4. No endianess handling. We suppose client and server share the same convention
+
+5. No sizeof(int) checks. We suppose int is always of size 4. Might apparently not always be the case.
+
+6. No checks if the file to be transfered already exists in destination. There is no warning, if the file
+exists, it is systematically crushed.
+
+7. The document in the server can only be stored where the exe server is. We should ask for a destination path
+    and check if it exists with the server. If exits => continue. If not, server's side : send error code & next
+     information to read : choice. Client's side : send path, read recieved error. If ok, continue. If nok, break.

@@ -18,6 +18,8 @@
 
 /***************************** FONCTIONS  *****************************/
 int IsConnected( int socket_number);
-void GetFileName(char * full_name, char * name);
+int GetFileName(char * full_name, char * name);
 int FileExists( char * name) ;
 int ReadFile(char * name, char ** content, int * size);
+int WriteFile(char * name, int content_size, char * content) ;
+void CheckError(int error, int quit);

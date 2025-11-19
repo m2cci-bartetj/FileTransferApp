@@ -102,7 +102,8 @@ void client_appli (char *serveur,char *service)
 	char * file_content ;						// Of unknown size at the moment
 	int file_size;
 	int nb_bytes_written, nb_bytes_read;
-	char error_code;
+	int error_code_serv, error_code_clie;
+	char * error;
 	char choice;
 	char size[INT_SIZE];						// Stocker file_size in char
 
@@ -144,49 +145,34 @@ void client_appli (char *serveur,char *service)
 				GetFileName(full_file_name, file_name);
 
 				// Récuperer la taille du fichier & son contenu
-				ReadFile(full_file_name, &file_content, &file_size);
+				error_code_clie = ReadFile(full_file_name, &file_content, &file_size);
+				//CheckError(error_code_clie, 1);
+				printf("file content : \n%s\n", file_content);
+				printf("file size : %d", file_size);
 
 				// Envoyer paramètres nécessaire : choix + taille + nom + content
 				// This should be done in one h_writes to have packets as big as possible.
-				// Testing in pieces for the moment.
-				h_writes(idSocket, &choice, 1);
-				h_writes(idSocket, (char *) &file_size, INT_SIZE);
-				h_writes(idSocket, file_name, FILENAME_MAX);
-				h_writes(idSocket, file_content, file_size);
+				// Testing in pieces for the moment. And no error management.
+				nb_bytes_written = h_writes(idSocket, &choice, 1);
+				printf("nb bytes written for choice %d\n", nb_bytes_written);
+				nb_bytes_written = h_writes(idSocket, (char *) &file_size, INT_SIZE);
+				printf("nb bytes written for file size %d\n", nb_bytes_written);
+				nb_bytes_written = h_writes(idSocket, file_name, MAX_NAME);
+				printf("nb bytes written for file name %d\n", nb_bytes_written);
+				nb_bytes_written = h_writes(idSocket, file_content, file_size);
+				printf("nb bytes written for file content %d\n", nb_bytes_written);
 
 				// Liberer la mémoire allouée 
 				free(file_content);
-				sleep(10);
 				
-				/*// Verifier quelles erreurs, si erreurs ont été provoquées côté serveur
-				// Juste imprimer l'erreur. Note : on ne peut pas en avoir plus que 255.
-				h_reads(idSocket, &error_code, 1);
-				switch(error_code) {
-					case '1' :
-						printf("Error in ... \n");
-						break;
-					case '2' :
-						printf("Error in ... \n");
-						break;
-					case '3' :
-						printf("Error in ... \n");
-						break;
-					case '4' :
-						printf("Error in ... \n");
-						break;
-					case '5' :
-						printf("Error in ... \n");
-						break;
-					case '6' :
-						printf("Error in ... \n");
-						break;
-					case '7' :
-						printf("Error in ... \n");
-						break;
-					default :
-						printf("Not yet registered error.\n");
-						break;
-				};*/
+				// Verifier quelles erreurs, si erreurs ont été provoquées côté serveur
+				// Juste imprimer l'erreur. On suppose que les erreurs sont provoquées par une
+				// mauvaise manipulation des fichiers.
+				//h_reads(idSocket, error, INT_SIZE);
+				//error_code_serv = (int) * error;
+				//CheckError(error_code_serv, 0);
+
+				// Sortir pour le prochain choix.
 				break;
 			/*case '2' : 
 				printf("Choix 2: récupérer un fichier.\n");

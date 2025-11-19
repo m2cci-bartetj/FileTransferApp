@@ -58,7 +58,7 @@ donnée : full_file_name : with path. Ex '../../DOC/README'
 résultat : file_name : without path. Ex : 'README'
 /!\ Depending on the OS, we have backslashes '\'.
 */
-void GetFileName(char * full_name, char * name) {
+int GetFileName(char * full_name, char * name) {
     printf("\n>>>>> DEBUG >>>>> \t GETFILENAME (debut)\n"); 
 
     // Definition
@@ -84,68 +84,65 @@ void GetFileName(char * full_name, char * name) {
     printf("\n>>>>> DEBUG >>>>> \t GETFILENAME (fin)\n");
 
     // Maybe a return to check that all is ok would be nice ?
+    return 1;
 }
 
 
 /*
-This function is useed to read a file name 'name', and get its size and contents.
-It returns the file contents
+This function is used to read a file name 'name', and get its size and contents.
+It returns the nb of objects read. If < 1, then there is an error.
 donnée : name
-résultat : size
-ouput : contents
+résultat : size, contents
 /!\ contents is stored in an allocated space. Which means it MUST be freed as soon as possible.
-/!\ we cannot pass contents as a parameter of this fonction. Indeed: 
-- char s[] = "string" results in a modifiable array of 7 bytes
-- char *s = "string" results in a pointer to some read-only memory containing the string-literal "string".
-WHICH means that if you want to modify the contents of your string, the first is the way to go.
-BUT we do not know the size of contents (nor the contents), so we cannot initialize it outside of the function. Thus it cannot be passed
-as a parameter.
 */
 int ReadFile(char * name, char ** content, int * size) {
 	printf("\n\n>>>>> DEBUG >>>>> \t READFILE (debut)\n"); 
 
     // Definitions
 	FILE * f;
+    int nb_objects;
 
 	// opening file
     //printf("\n>>>>> DEBUG >>>>> \t opening file \n");
 	f = fopen(name, "rb");
 	if (f == NULL) {
-		perror("Erreur d'ouverture");
-		exit(1);
+		perror("Erreur d'ouverture\n");
+		exit(2);
 	};
 
 	// searching for file size : position at the end, get size, reposition at the start.
     //printf("\n>>>>> DEBUG >>>>> \t searching for size \n");
 	if (fseek(f, 0, SEEK_END) != 0) {
-		perror("Erreur de positionnement en fin");
-		exit(1);
+		perror("Erreur de positionnement en fin\n");
+		exit(3);
 	};
 	* size = (int) ftell(f);
     if (fseek(f, 0, SEEK_SET) != 0) {
-		perror("Erreur de positionnement en début");
-		exit(1);
+		perror("Erreur de positionnement en début\n");
+		exit(4);
 	};
 
 	// Creating buffer with correct size
     //printf("\n>>>>> DEBUG >>>>> \t linking content to correct memory allocation\n");
 	*content = malloc(*size +1);
     if (*content == NULL) {
-        perror("Erreur d'allocation de mémoire");
-		exit(1);
+        perror("Erreur d'allocation de mémoire\n");
+		exit(5);
     }
 
 	// Storing in buffer file (no checks if reads correct nb of objects)
     //printf("\n>>>>> DEBUG >>>>> \t READFILE (reading file) size %d\n", *size);
-	fread(*content, *size, 1, f);
-    printf("\n>>>>> DEBUG >>>>> \t READFILE (reading file) content \n%s\n", *content);
-    printf("\n>>>>> DEBUG >>>>> \t READFILE (reading file) length content %ld\n", strlen(*content));
+	nb_objects = fread(*content, *size, 1, f);
+    if (nb_objects < 1) {
+        perror("Erreur de lecture dans le flot\n");
+		exit(6);
+    };
 
     // Closing stream
     // printf("\n>>>>> DEBUG >>>>> \tREADFILE (closing file)\n");
     if (fclose(f) == EOF) {
-		perror("Erreur de fermeture du flot");
-		exit(1);
+		perror("Erreur de fermeture du flot\n");
+		exit(7);
 	};
     
     // All is well
@@ -154,4 +151,80 @@ int ReadFile(char * name, char ** content, int * size) {
 
 }
 
+/*
+This function is used to write content of size content_size in a file of name name.
+Each input parameter is a donnée.
+Return : 1 if all is ok. Error code if not.
+*/
+int WriteFile(char * name, int content_size, char * content) {
+    printf("\n\n>>>>> DEBUG >>>>> \t WRITEFILE (debut)\n"); 
 
+    // Definitions
+	FILE * f;
+    int nb_bytes;
+
+	// Opening file in mode w. Warning, this destroys any existent file with the same name.
+	f = fopen(name, "wb");
+	if (f == NULL) {
+		perror("Erreur d'ouverture\n");
+		exit(2);
+	};
+
+	// Writing in file
+    // int fwrite(void *t, int size, int nbel, FILE *fp);
+	nb_bytes = fwrite(content, 1, content_size, f);
+    if (nb_bytes < content_size) {
+        perror("Erreur d'écriture dans le flot\n");
+		exit(8);
+    };
+
+    // Closing stream
+    if (fclose(f) == EOF) {
+		perror("Erreur de fermeture du flot\n");
+		exit(7);
+	};
+
+    // all is well
+    printf("\n>>>>> DEBUG >>>>> \t WRITEFILE (fin)\n");
+    return 1;
+
+}
+
+
+/*
+This function takes an error code, prints associated message, and exit if asked.
+*/
+void CheckError(int error, int quit) {
+    switch(error) {
+		case 1 :
+		    printf("No errors to report.\n");
+		    break;
+		case 2 :
+			printf("Erreur d'ouverture.\n");
+			break;
+		case '3' :
+			printf("Erreur de positionnement en fin.\n");
+			break;
+		case '4' :
+			printf("Erreur de positionnement en début.\n");
+			break;
+		case '5' :
+			printf("Erreur d'allocation de mémoire.\n");
+			break;
+		case '6' :
+			printf("Erreur de lecture dans le flot.\n");
+			break;
+		case '7' :
+			printf("Erreur de fermeture du flot.\n");
+			break;
+		case '8' :
+			printf("Erreur d'écriture dans le flot.\n");
+			break;
+		default :
+			printf("Not yet registered error.\n");
+			break;
+	};
+    if (quit) {
+        exit(EXIT_FAILURE);
+    };
+}
