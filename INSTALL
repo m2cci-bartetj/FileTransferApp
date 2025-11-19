@@ -1,0 +1,16 @@
+Since the code is small, it has been decided to keep the object and executable files
+in the same place as the source files : in src/ and not a seperate obj/ folder.
+
+To install, go to src/ and type make.
+
+Please make sure to use the executables inside their respective folders client and server
+so that the exchange of data is done in between these to folders without touching to the 
+source files. To enforce this rule, do not hesitate to create symbolic links in each
+folder to the appropriate executable : 
+
+    $ cd client
+    $ ln -s ../src/client client
+
+    $ cd server
+    $ ln -s ../src/serveur serveur
+

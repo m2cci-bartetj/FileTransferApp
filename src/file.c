@@ -1,62 +1,23 @@
-/* This script is used for all functions needed by both client and server
+/* 
+-----------------------------------------------------------------------------------------
+This script is used for all additional functions needed by both client and server
+-----------------------------------------------------------------------------------------
 */
 
 #include "file.h"       /* pour ces propres fonctions & definitions & inclusions*/
-#include "fon.h"        /* pour les primitives socket */
 
 /*
-This function returns :
-    - 1 if the connection still exists for socket id socketNumber
-    - 0 if not
-In order to know whether or not a connection still exists or not, several options : 
-    1. Look into netstat -... for the correct socket id and get the status. If status = ESTABLISHED
-        then return 1. Else return 0. This requires system( bash_command ) command. But that command takes only
-        a constant bash_command. And here the socket id is a variable. So we need a bash script called with
-        arguments = socketNumber
-    2.  Look into the files that netstat looks into to get the connection status. Use read_file(), and add
-        a search in file function. OR again use a bash script with grep command on the correct file, and 
-        either (1) store the output information in file that will need to be read; or (2) get the ouput with
-        stdio stdout flow. No idea how to at the moment.
-    3. Suppose that the client sends a warning before close. Do a socket_read. If you get the warning, then return
-    0, if not, return 1. Attention, h_reads est blocant ! C'est à dire que si il ne reçoit rien, il attends indéfiniement !
-    Donc il faut envoyer un message disant que l'on veut poursuivre la connection. Autre chose : il faut s'assurer
-    que l'on a bien lu tout ce qu'il y avait dans le buffer avant !
-    4. Get the information out of socket status. No idea if possible, but surely should be right ?
-Note : only the client can close a connection.
-Note : if we use bash scripts or store information for the connection in a file, we must be sure that this file
-does not already exists = does not belong to the original 'useful' file system.
-*/
-int IsConnected(int socket_number) {
-    return 1;
-}
-
-
-
-/*
-This function returns : 
-    - 0 if file_name does not exist
-    - 1 if file_name does
-Note that file_name may contain a path. Ex : '../../DOC/README'.
-Note that depending on the OS, the '/' between the repertories are sometimes '\'.
-Solution : 
-    1. try opening this file. If works, return 1, else return 0. Not great since we could have an error opening an existing file
-    2. use bash command. Again, not great since this command would be 'ls file_name', which is a variable. So system() does not
-     work => we need bash script with ouput arguments. Store result either in file to be read and destroyed, or in stdout.
-    3. try accessing to file system via C command. No idea if possible.
-*/
-int FileExists(char * name) {
-    return 1;
-}
-
-
-/*
+-----------------------------------------------------------------------------------------
+                int GetFileName(char * full_name, char * name)
+-----------------------------------------------------------------------------------------
 This function is used to seperate the path from the actual file name.
 Indeed, since we do not specify WHERE we put the file in the server, we must only
 give the file name without the path to the server.
 
-donnée : full_file_name : with path. Ex '../../DOC/README'
-résultat : file_name : without path. Ex : 'README'
-/!\ Depending on the OS, we have backslashes '\'.
+donnée : full_name : with path. Ex '../../DOC/README'
+résultat : name : without path. Ex : 'README'
+/!\ Depending on the OS, we can have backslashes '\'.
+-----------------------------------------------------------------------------------------
 */
 int GetFileName(char * full_name, char * name) {
     printf("\n>>>>> DEBUG >>>>> \t GETFILENAME (debut)\n"); 
@@ -89,11 +50,15 @@ int GetFileName(char * full_name, char * name) {
 
 
 /*
+-----------------------------------------------------------------------------------------
+            int ReadFile(char * name, char ** content, int * size)
+-----------------------------------------------------------------------------------------
 This function is used to read a file name 'name', and get its size and contents.
 It returns the nb of objects read. If < 1, then there is an error.
 donnée : name
 résultat : size, contents
 /!\ contents is stored in an allocated space. Which means it MUST be freed as soon as possible.
+-----------------------------------------------------------------------------------------
 */
 int ReadFile(char * name, char ** content, int * size) {
 	printf("\n>>>>> DEBUG >>>>> \t READFILE (debut)\n"); 
@@ -152,9 +117,13 @@ int ReadFile(char * name, char ** content, int * size) {
 }
 
 /*
+-----------------------------------------------------------------------------------------
+        int WriteFile(char * name, int content_size, char * content)
+-----------------------------------------------------------------------------------------
 This function is used to write content of size content_size in a file of name name.
 Each input parameter is a donnée.
 Return : 1 if all is ok. Error code if not.
+-----------------------------------------------------------------------------------------
 */
 int WriteFile(char * name, int content_size, char * content) {
     printf(">>>>> DEBUG >>>>> \t WRITEFILE (debut)\n"); 
@@ -192,7 +161,11 @@ int WriteFile(char * name, int content_size, char * content) {
 
 
 /*
+-----------------------------------------------------------------------------------------
+                         void CheckError(int error, int quit) 
+-----------------------------------------------------------------------------------------
 This function takes an error code, prints associated message, and exit if asked.
+-----------------------------------------------------------------------------------------
 */
 void CheckError(int error, int quit) {
     switch(error) {
@@ -231,6 +204,9 @@ void CheckError(int error, int quit) {
 
 
 /*
+-----------------------------------------------------------------------------------------
+          int GetFileSystem (char * output, const int size, const char * command) 
+-----------------------------------------------------------------------------------------
 This function is use to get the output of a system command in output[]
 For simplicity, we have decided to set the size of the output. 
 There are several way of getting the ouput of a command : 
@@ -238,6 +214,7 @@ There are several way of getting the ouput of a command :
 requires having a file name that does not already exist.
 - or creating a pipe between the calling program and the excuted command, where we can both write and
 read. /!\ we are creating a child process : it must be closed.
+-----------------------------------------------------------------------------------------
 */
 int GetFileSystem (char * output, const int size, const char * command) {
     // Definitions
