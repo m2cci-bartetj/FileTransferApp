@@ -28,7 +28,8 @@
 // Mon Port serveur
 #define SERVICE_DEFAUT "1111"
 #define MAX_NAME 100		// FILENAME_MAX of 4096 creates pb with accept : memory shortage ?
-#define INT_SIZE 4
+#define INT_SIZE 5
+#define MAX_FILESYSTEM_SIZE 500
 
 void serveur_appli (char *service);   /* programme serveur */
 
@@ -75,13 +76,14 @@ void serveur_appli(char *service)
 	struct sockaddr_in p_adr_client;
 	int nb_req_att = 5;
 
-	char choice ;						// choice of the procedure to follow
-	char file_size[INT_SIZE];			// file size in char format
-	int size;							// file size in int format
-	char file_name[MAX_NAME];			// Name of the file
-	char * file_content;				// pointer for the content of the file. Allocated dynamically => must be freed
-	int nb_bytes_written, nb_bytes_read;
-	int error_code_serv, error_code_clie;
+	char choice ;							// choice of the procedure to follow
+	char file_size[INT_SIZE];				// file size in char format
+	int size;								// file size in int format
+	char file_name[MAX_NAME];				// Name of the file
+	char * file_content;					// pointer for the content of the file. Allocated dynamically => must be freed
+	int nb_bytes_written, nb_bytes_read;	// Mostly used for visual error handling
+	int error_code_serv, error_code_clie;	// Error handling
+	char file_system[MAX_FILESYSTEM_SIZE];	// file_system
 
 	/* 1. CONFIGURATION D'UNE CONNEXION*/
 	// 1.1. Création d'une socket
@@ -125,7 +127,7 @@ void serveur_appli(char *service)
 					
 					// On lit taille du fichier : 
 					h_reads(idNewSocket, file_size, INT_SIZE);
-					size = (int) * file_size;
+					size = (int)strtol(file_size, NULL, 16);
 					printf("size of file : %d \n", size);
 					
 					// On lit le nom du ficher
@@ -151,18 +153,45 @@ void serveur_appli(char *service)
 					break;
 				case '2' : 
 					printf("\n Choix 2: envoyer un fichier serveur -> client.\n");
-					// Envoi d'un fichier : on doit envoyer un fichier au client.
-					// On lit le reste du message pour avoir nom du fichier. Max size = FILENAME_MAX.
-					// Vérifier que ce fichier existe. Si non, envoyer code FILE_NON_EXISTANT
-					// Envoyer le contenu du fichier : taille fichier + données
-					
+					// Envoyer la liste des fichiers du répertoire courant seulement.
+					// The command can be changed here if needed. Note that
+					GetFileSystem(file_system, MAX_FILESYSTEM_SIZE, "ls -p | grep -v /");
+					nb_bytes_written = h_writes(idNewSocket, file_system, MAX_FILESYSTEM_SIZE);
+					printf("nb bytes written for file system %d\n", nb_bytes_written);
+
+					// Récuperer le nom du fichier à transferer. 
+					h_reads(idNewSocket, file_name, MAX_NAME);
+					printf("Name of file : %s \n", file_name);
+
+					// Récuperer la taille du fichier & son contenu
+					error_code_clie = ReadFile(file_name, &file_content, &size);
+					//CheckError(error_code_clie, 1);
+					printf("file content : \n%s\n", file_content);
+					printf("file size : %d\n", size);
+
+					// Convert size to file_size[]. We need table size(int)+1 for \0.
+					sprintf(file_size, "%x", size);
+
+					// Envoyer paramètres nécessaire : taille + content
+					// This should be done in one h_writes to have packets as big as possible.
+					// Testing in pieces for the moment. And no error management.
+					nb_bytes_written = h_writes(idNewSocket, file_size, INT_SIZE);
+					printf("nb bytes written for file size %d\n", nb_bytes_written);
+					nb_bytes_written = h_writes(idNewSocket, file_content, size);
+					printf("nb bytes written for file content %d\n", nb_bytes_written);
+
+					// Liberer la mémoire allouée 
+					free(file_content);
+
 					// Message final ok/nok
-					choice = '3';
+
+					// closing connection : only for testing.
+					//choice = '3';
 					break;
 				case '3' :
 					// The client is closing the connection 
 					// Do nothing, we will get out of the while naturally
-					printf("\n Choix 3 : le client ferme la connexion.\n\n");
+					printf("\n Choix 3 : le client ferme la connexion.\n");
 					break;
 				default : 
 					// any other number should not exist. As a precaution, close connection.

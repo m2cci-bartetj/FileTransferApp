@@ -96,7 +96,7 @@ résultat : size, contents
 /!\ contents is stored in an allocated space. Which means it MUST be freed as soon as possible.
 */
 int ReadFile(char * name, char ** content, int * size) {
-	printf("\n\n>>>>> DEBUG >>>>> \t READFILE (debut)\n"); 
+	printf("\n>>>>> DEBUG >>>>> \t READFILE (debut)\n"); 
 
     // Definitions
 	FILE * f;
@@ -146,7 +146,7 @@ int ReadFile(char * name, char ** content, int * size) {
 	};
     
     // All is well
-    printf("\n>>>>> DEBUG >>>>> \t READFILE (fin)\n");
+    printf(">>>>> DEBUG >>>>> \t READFILE (fin)\n");
     return 1;
 
 }
@@ -157,7 +157,7 @@ Each input parameter is a donnée.
 Return : 1 if all is ok. Error code if not.
 */
 int WriteFile(char * name, int content_size, char * content) {
-    printf("\n\n>>>>> DEBUG >>>>> \t WRITEFILE (debut)\n"); 
+    printf(">>>>> DEBUG >>>>> \t WRITEFILE (debut)\n"); 
 
     // Definitions
 	FILE * f;
@@ -185,7 +185,7 @@ int WriteFile(char * name, int content_size, char * content) {
 	};
 
     // all is well
-    printf("\n>>>>> DEBUG >>>>> \t WRITEFILE (fin)\n");
+    printf(">>>>> DEBUG >>>>> \t WRITEFILE (fin)\n");
     return 1;
 
 }
@@ -228,3 +228,36 @@ void CheckError(int error, int quit) {
         exit(EXIT_FAILURE);
     };
 }
+
+
+/*
+This function is use to get the output of a system command in output[]
+For simplicity, we have decided to set the size of the output. 
+There are several way of getting the ouput of a command : 
+- either storing ouput in file and reading file (system("ls * > file 2>&1")) but that at least
+requires having a file name that does not already exist.
+- or creating a pipe between the calling program and the excuted command, where we can both write and
+read. /!\ we are creating a child process : it must be closed.
+*/
+int GetFileSystem (char * output, const int size, const char * command) {
+    // Definitions
+    FILE * f;
+    
+    // Open new flow
+    if ((f = popen(command, "r")) == NULL) {
+		perror("Erreur d'ouverture\n");
+		exit(2);
+	};
+
+    // storing command response in file_system
+    fread(output, 1, size, f);
+	//printf("output : \n %s\n", output);
+    
+    // Closing flow
+    pclose(f);
+
+    // All is well
+    return 1;
+
+}
+

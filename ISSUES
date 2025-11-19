@@ -25,3 +25,10 @@ exists, it is systematically crushed.
 7. The document in the server can only be stored where the exe server is. We should ask for a destination path
     and check if it exists with the server. If exits => continue. If not, server's side : send error code & next
      information to read : choice. Client's side : send path, read recieved error. If ok, continue. If nok, break.
+
+8. Use allocated memory for file system. And better printing !
+
+9. Replace scanf by fgets to control size of input string.
+
+10. Display more than first existing files in current repertory. Which means that the client must search a different way
+the existences of the file name it wants to retrieve.

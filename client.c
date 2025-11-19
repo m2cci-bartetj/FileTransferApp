@@ -30,7 +30,7 @@
 #define SERVEUR_DEFAUT "127.0.0.1"
 #define MAX_FILESYSTEM_SIZE 500
 #define MAX_NAME 100		// since FILEMAX_NAME = 4096 appears to be too big. Creates a h_accept :acceptation impossible.
-#define INT_SIZE 4
+#define INT_SIZE 5
 
 void client_appli (char *serveur, char *service);
 
@@ -100,12 +100,12 @@ void client_appli (char *serveur,char *service)
 	char file_name[MAX_NAME];				// file name without path
 	char file_system[MAX_FILESYSTEM_SIZE];		// file_system
 	char * file_content ;						// Of unknown size at the moment
-	int file_size;
 	int nb_bytes_written, nb_bytes_read;
 	int error_code_serv, error_code_clie;
 	char * error;
 	char choice;
-	char size[INT_SIZE];						// Stocker file_size in char
+	char file_size[INT_SIZE];				// file size in char format
+	int size;								// file size in int format
 
 	// 3.1 Choix de la procédure : envoyer ou récupérer un fichier ou sortir ?
 	choice = '0';
@@ -145,21 +145,24 @@ void client_appli (char *serveur,char *service)
 				GetFileName(full_file_name, file_name);
 
 				// Récuperer la taille du fichier & son contenu
-				error_code_clie = ReadFile(full_file_name, &file_content, &file_size);
+				error_code_clie = ReadFile(full_file_name, &file_content, &size);
 				//CheckError(error_code_clie, 1);
 				printf("file content : \n%s\n", file_content);
-				printf("file size : %d", file_size);
+				printf("file size : %d", size);
+
+				// Convert size to file_size[]. We need table size(int)+1 for \0.
+				sprintf(file_size, "%x", size);
 
 				// Envoyer paramètres nécessaire : choix + taille + nom + content
 				// This should be done in one h_writes to have packets as big as possible.
 				// Testing in pieces for the moment. And no error management.
 				nb_bytes_written = h_writes(idSocket, &choice, 1);
 				printf("nb bytes written for choice %d\n", nb_bytes_written);
-				nb_bytes_written = h_writes(idSocket, (char *) &file_size, INT_SIZE);
+				nb_bytes_written = h_writes(idSocket, file_size, INT_SIZE);
 				printf("nb bytes written for file size %d\n", nb_bytes_written);
 				nb_bytes_written = h_writes(idSocket, file_name, MAX_NAME);
 				printf("nb bytes written for file name %d\n", nb_bytes_written);
-				nb_bytes_written = h_writes(idSocket, file_content, file_size);
+				nb_bytes_written = h_writes(idSocket, file_content, size);
 				printf("nb bytes written for file content %d\n", nb_bytes_written);
 
 				// Liberer la mémoire allouée 
@@ -174,52 +177,54 @@ void client_appli (char *serveur,char *service)
 
 				// Sortir pour le prochain choix.
 				break;
-			/*case '2' : 
-				printf("Choix 2: récupérer un fichier.\n");
+			case '2' : 
+				printf("\n Choix 2: envoyer un fichier serveur -> client.\n");
 				// Envoyer notre choix pour que le serveur nous envoie son répertoire courant
 				// jusqu'à inode donnée?
 				nb_bytes_written = h_writes(idSocket, &choice, 1);
+				printf("nb bytes written for choice %d\n", nb_bytes_written);
 
 				// Afficher ce que le serveur nous envoie
 				nb_bytes_read = h_reads(idSocket, file_system, MAX_FILESYSTEM_SIZE);
+				printf("\nExisting files : \n%s\n", file_system);
 				
-				// Taper le nom du ficher à récupérer
+				// Taper le nom du ficher à récupérer. Ce nom ne peut être que dans la liste
+				// des fichiers envoyés. Comme ça, cela nous permet de ne pas envoyer une demande
+				// d'existance au serveur. Note : le fichier peut être existant mais pas ouvrable ni
+				// modifiable !
 				printf("Veuillez fournir le nom de votre fichier.\n");
-				fgets(full_file_name, FILENAME_MAX, stdin);
+				scanf("%s", full_file_name);
+				while ( strstr(file_system, full_file_name) == NULL ) {
+					printf("Ce fichier n'existe pas. Veuillez entrer un nom correct : ");
+					scanf("%s", full_file_name);
+				};
+				printf("Full file name : %s\n", full_file_name);
 				
 				// Faire une demande d'envoi de ce fichier vers le serveur : nom du fichier
-				nb_bytes_written = h_writes(idSocket, &full_file_name, FILENAME_MAX);
+				nb_bytes_written = h_writes(idSocket, full_file_name, MAX_NAME);
+				printf("nb bytes written for file name %d\n", nb_bytes_written);
+
+				// On lit taille du fichier : 
+				h_reads(idSocket, file_size, INT_SIZE);
+				size = (int)strtol(file_size, NULL, 16);
+				printf("size of file : %d \n", size);
+
+				// On lit le contenu fichier : 
+				file_content = malloc(size);
+				h_reads(idSocket, file_content, size);
+				printf("file content : \n%s\n", file_content);
+
+				// On créé nom_fichier et mettons contenu_fichier dedans
+				// Si il y a une erreur, on ne sort pas.
+				error_code_serv = WriteFile(full_file_name, size, file_content);
+				free(file_content);
 
 				// Récupérer le code d'erreur
-				nb_bytes_read = h_reads(idSocket, &error_code, 1);
+				
 
-				// Si = 0 : le fichier n'est pas connu. Si = 1, il l'est.
-				// Il peut avoir d'autres codes d'erreur ! => faire un switch.
-				if (error_code) {
-					printf("Le fichier n'est pas connu.\n");
-				}
-				else {
-					// Récuperer la taille du fichier
-					// We suppose sizeof(int) in the same on both computers.
-					nb_bytes_read = h_reads(idSocket, &size, sizeof(int));
-
-					// Convertir cette taille en int, et allouer le bon espace
-					ConvertChar2Int(&file_size, size);
-					char * file_content = malloc(file_size);
-
-					// Lire le contenu du fichier récupéré.
-					nb_bytes_read = h_reads(idSocket, file_content, file_size);
-
-					// Ecrire dans un nouveau fichier 
-					WriteFile(file_name, file_size, file_content);
-
-					// Liberer
-					free(file_content);
-					
-				};
-				break;*/
+				break;
 			case '3' : 
-				printf("Choix 3: sortir sans rien faire.\n\n");
+				printf("\nChoix 3: sortir sans rien faire.\n");
 				// Envoyer le choix au serveur. Verifier que le nb de bytes envoyés
 				// est correct. Sinon, recommencer. PAs sublime comme test d'erreur.
 				//do {
@@ -229,7 +234,7 @@ void client_appli (char *serveur,char *service)
 				break;
 			default : 
 				// au cas où les gens ne savent pas taper, sortir et ne pas leur laisser une autre chance.
-				printf("\n Utilisation : (1) envoyer fichier; (2) récupérer fichier; (3) sortir. \n\n");
+				printf("\nUtilisation : (1) envoyer fichier; (2) récupérer fichier; (3) sortir.\n");
 				choice = '3';
 				// Nb bytes written utile si on veut faire un test que tout c'est bien passé.
 				nb_bytes_written = h_writes(idSocket, &choice, 1);
