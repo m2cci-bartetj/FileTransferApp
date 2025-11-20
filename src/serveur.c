@@ -154,8 +154,9 @@ void serveur_appli(char *service)
 				case '2' : 
 					printf("\n Choix 2: envoyer un fichier serveur -> client.\n");
 					// Envoyer la liste des fichiers du répertoire courant seulement.
-					// The command can be changed here if needed. Note that
-					GetFileSystem(file_system, MAX_FILESYSTEM_SIZE, "ls -p | grep -v /");
+					// The command can be changed here if needed. Note that only files
+					// are given here, and should have the proper path if contained in a repertory.
+					GetFileSystem(file_system, MAX_FILESYSTEM_SIZE, "find . -type f | sed 's/^.\///'");
 					nb_bytes_written = h_writes(idNewSocket, file_system, MAX_FILESYSTEM_SIZE);
 					printf("nb bytes written for file system %d\n", nb_bytes_written);
 

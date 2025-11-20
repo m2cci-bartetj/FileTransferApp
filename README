@@ -1,34 +1,44 @@
-In order to know whether or not the server is connected : 
+Ce document fourni le squelette des deux codes client/serveur avec leur échanges respectifs.
 
-This function returns :
-    - 1 if the connection still exists for socket id socketNumber
-    - 0 if not
-In order to know whether or not a connection still exists or not, several options : 
-    1. Look into netstat -... for the correct socket id and get the status. If status = ESTABLISHED
-        then return 1. Else return 0. This requires system( bash_command ) command. But that command takes only
-        a constant bash_command. And here the socket id is a variable. So we need a bash script called with
-        arguments = socketNumber
-    2.  Look into the files that netstat looks into to get the connection status. Use read_file(), and add
-        a search in file function. OR again use a bash script with grep command on the correct file, and 
-        either (1) store the output information in file that will need to be read; or (2) get the ouput with
-        stdio stdout flow. No idea how to at the moment.
-    3. Suppose that the client sends a warning before close. Do a socket_read. If you get the warning, then return
-    0, if not, return 1. Attention, h_reads est blocant ! C'est à dire que si il ne reçoit rien, il attends indéfiniement !
-    Donc il faut envoyer un message disant que l'on veut poursuivre la connection. Autre chose : il faut s'assurer
-    que l'on a bien lu tout ce qu'il y avait dans le buffer avant !
-    4. Get the information out of socket status. No idea if possible, but surely should be right ?
-Note : only the client can close a connection.
-Note : if we use bash scripts or store information for the connection in a file, we must be sure that this file
-does not already exists = does not belong to the original 'useful' file system.
-
-
-This function returns : 
-    - 0 if file_name does not exist
-    - 1 if file_name does
-Note that file_name may contain a path. Ex : '../../DOC/README'.
-Note that depending on the OS, the '/' between the repertories are sometimes '\'.
-Solution : 
-    1. try opening this file. If works, return 1, else return 0. Not great since we could have an error opening an existing file
-    2. use bash command. Again, not great since this command would be 'ls file_name', which is a variable. So system() does not
-     work => we need bash script with ouput arguments. Store result either in file to be read and destroyed, or in stdout.
-    3. try accessing to file system via C command. No idea if possible.
+-------------------------------------------------------------------------------------------------------------------------------------------
+CLIENT                                                              SERVEUR
+-------------------------------------------------------------------------------------------------------------------------------------------
+création d'une socket                                               création d'une socket
+                                                                    configuration de la socket
+                                                                    mise en écoute
+connexion et configuration de la socket                    >>>>>    attendre une demande de connexion sur une nouvelle socket en boucle \infty
+-------------------------------------------------------------------------------------------------------------------------------------------
+Echange de données :                                                Echange de données :
+choix = 0                                                           choix = 0
+tant que (choix != 3)                                               tant que (choix !=3)
+start tantque                                                       start tantque
+choix : 1. envoyer fichier client -> serveur                        choix = socket_lire choix envoyé par le client
+        2. envoyer fichier serveur -> client
+        3. sortir.
+*******************************************************************************************************************************************
+Choix 1 :                                                           Choix 1 : 
+récupérer nom du fichier                                            
+récupérer contenu du fichier et taille du fichier                   
+socket_envoyer choix + taille + nom + contenu               >>>>>   socket_lire taille + nom + contenu du fichier
+liberer contenu                                                     ecrire contenu dans un fichier <nom>
+verifier qu'il n'y a pas eu d'erreurs                       <<<<<   envoyer code d'erreur (même si il n'y en a pas.)
+*******************************************************************************************************************************************
+Choix 2 :                                                           Choix 2 : 
+socket_envoyer choix                                        >>>>>        
+socket_lire fichiers dans répertoire courant du serveur     <<<<<   socket_envoyer fichiers dans le répertoire courant
+choisir un nom de fichier existant          
+socket_envoyer le nom du fichier                            >>>>>   socket_lire le nom du fichier
+                                                                    récuperer contenu + taille du fichier
+socket_lire taille + contenu du fichier                     <<<<<   socket_envoyer taille + contenu
+ecrire contenu dans fichier de nom choisi                           liberer contenu
+*******************************************************************************************************************************************
+Choix 3 :                                                           Choix 3 : 
+socket_envoyer choix                                        >>>>>   On sort naturellement avec la condition tantque
+*******************************************************************************************************************************************
+Choix defaut :                                                      Choix defaut : 
+socket_envoyer choix = 3                                    >>>>>   Normalement ne devrait pas exister. Au cas où, choix = 3
+*******************************************************************************************************************************************
+endtantque                                                          endtantque
+-------------------------------------------------------------------------------------------------------------------------------------------
+Fermer la connexion                                                 Fermer la connexion
+-------------------------------------------------------------------------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 
 1. Error handling : None. NOT GOOD. Client side, no exit from connection when exit from file handling error. 
- We should have  in CheckError() the possibility of changing the choice (and perhaps sending the choice)
+ We should have in CheckError() the possibility of changing the choice (and perhaps sending the choice)
  in order to close connection properly. At the moment, only errors on file handling. NOT GOOD. We need error
  checks at the start of each sent/recieved messages.
 
@@ -11,7 +11,9 @@
         - a ReadFile() function with input parameter the size of the block to read + position of lecture.
         - a seperate SizeFile() function to get the size of the file seperatly from the reading
         - a WriteFile() function with input parameter the size of the block to write, and the writing options
-            ( wb only at the start to squash any existing file, then ab to add content at the end.)
+            ( "wb" only at the start to squash any existing file, then "ab" to add content at the end.)
+OR since getting the position is heavy, inside the ReadFile function, open the file once, do a loop, and
+inside read x bytes and send x bytes. Until sum_nb_bytes_written = size of file OR until end of file mark.
 
 3. No endianess handling. We suppose client and server share the same convention
 
@@ -25,9 +27,17 @@ and check if it exists with the server. If exits => continue. If not, server's s
 information to read : choice. Client's side : send path, read recieved error. If ok, continue. If nok, break.
 Same when we want to get file : we can only store it where client is called.
 
+9. Display more than first existing files in current repertory. Which means that the client must search a different way
+the existences of the file name it wants to retrieve.
+
 7. Use allocated memory for file system. And better printing !
 
 8. Replace scanf by fgets to control size of input string.
 
-9. Display more than first existing files in current repertory. Which means that the client must search a different way
-the existences of the file name it wants to retrieve.
+10. Sending is done property by property for testing reasons. However, this is a loss of time since un-used padding must be 
+added to eah sent package. The heavier the property %1448, the better.
+
+11. Sequential server : it can treat only one client at a time. Multiple clients would be interesting => use fork()
+
+PB with word search in string => split string into words
+PB with allocatd memory wich seems to have some leftovers, but not printed in file... ODD

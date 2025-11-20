@@ -1,0 +1,97 @@
+Ce document fournit les choix qui ont été fait pour construire nos applications client/serveur.
+Vous trouverez le squelette des codes dans README.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+Objectifs
+-------------------------------------------------------------------------------------------------------------------------------------------
+Notre application permet de transferer des fichiers d'un client vers un serveur et vice-versa. On souhaite : 
+    1. Envoyer un fichier du client au serveur. Pour cela, on veut fournir un nom de fichier existant dans
+     notre arborescence, et l'envoyer au serveur. Une option possible serait de pouvoir choisir le répertoire
+     de destination. Une autre option serait d'être averti si le fichier existe déjà, et demander si on veut
+     l'écraser ou non (dans quel cas le transfer ne sera pas fait).
+    2. Envoyer un fichier du client au serveur. Pour cela, le serveur doit au minimum nous fournir la liste
+    des fichiers qu'il détient dans son répertoire. Une option possible serait de nous fournir tous les fichiers
+    existants dans l'arborescence descendante. De cette liste, le client choisi un nom de fichier. Le serveur
+    doit alors envoyer le contenu de ce fichier au client qui le stockera dans un fichier avec le nom correct.
+    Encore, on pourrait avoir une demande de confirmation si le fichier existe déjà.
+    3. Sortir de la connexion que quand on le veut : ne pas le faire par défaut à la fin des traitements de requêtes.
+    Donc il faut demander à l'utilisateur si il veut continuer d'échanger des fichiers ou non.
+
+Nous ne nous posons pas de contraintes de temps et de mémoire. L'application doit fonctionner pour un client qui
+se connecte à un serveur. Nous ne nous intéressons pas aux accès multiples.
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+Protocole choisi : TCP
+-------------------------------------------------------------------------------------------------------------------------------------------
+Pour l'échange de données, nous avons deux choix : UDP ou TCP. Le premier est dit "sans connexion"
+c'est à dire qu'il fait pas de demande de connexion, et donc il n'a aucune gestion de perte de paquets
+ni de controle de flux. Cependant, c'est un protocole qui permet de faire des échanges en temps réel,
+même si il n'y a aucune garanti que ces échanges soient effectués, et soient vrais.
+A l'inverse, TCP permet de faire du controle de flux et de la gestion de perte de paquets, ce qui 
+garantit plus fortement la bonne réception de l'information. En revanche, ce protocole n'est pas adapté
+pour les échanges en temps réel, car il requiert des réémissions quand les paquets sont perdus.
+
+Dans notre cas, nous n'avons pas de contraintes de temps, mais des contraintes de qualité de service.
+C'est pour cela que nous avons choisi TCP pour l'échange de nos données.
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+Définition client
+-------------------------------------------------------------------------------------------------------------------------------------------
+Le client est la machine qui initialise la connexion. Après avoir configuré une socket donnée, il
+fait une demande de connexion à une machine serveur. Il envoie des requêtes au serveur pendant l'échange
+des données. L'échange de données se fait pendant une connexion seulement. C'est également lui qui termine 
+la connexion en premier après avoir averti le serveur.
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+Définition serveur
+-------------------------------------------------------------------------------------------------------------------------------------------
+Le serveur est la machine qui se place en écoute : sa socket est en attente de connexion. Après avoir
+accepté une connexion, il crée une nouvelle socket pour la connexion donnée pendant qu'il reste en écoute.
+On suppose ici que l'on travaille sur un serveur itératif : les requêtes sont traitées de manière séquentielle
+par le même processeurs. Donc le serveur est connecté à un client uniquement à un temps donné. Etant donné
+que notre objectif n'est pas de créé un serveur de stockage de dossier pour de multiples utilisateurs, ce n'est
+pas un problème.
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+Hypothèses
+-------------------------------------------------------------------------------------------------------------------------------------------
+1. Les fichiers ont des tailles petites : < 2^32-1 pour stocker leur taille dans un int. Egalement, on décide
+de copier le contenu total du fichier dans une variable pour envoyer cette variable via TCP. Cela veut dire que
+la mémoire tient la taille du fichier + copie du fichier ouvert + variable avec le contenu. Ce choix n'est pas 
+optimal et fait parti des améliorations à faire (ISSUES).
+
+2. Seulement un utilisateur/client utilise le serveur : pas besoin d'accès multiples. Là encore, le code peut évoluer.
+
+3. C'est le client qui initie la fin de la connexion. Il y a plusieurs moyens pour le serveur savoir si la connexion
+ a été fermée :
+        - regarder dans netstat -... pour la correcte socket id et récupérer le status. Si le status est != ESTABLISHED
+        alors la connection doit être fermée. Soit ouvrir un processus et stocket le résultat de la commande dans une
+        variable, ou stocker ce résultat dans un fichier qui peut être lu. Problème : le nom de ce fichier ne doit pas
+        exister, et il doit être en lecture seulement.
+        - regarder la commande socket status. Normalement, le status de la socket devrait être modifié avec la fermeture
+        de la connexion. Encore, lire le résultat.
+        - directement regarder dans les fichier que netstat utilise pour afficher ses résultats.
+        - supposer que le client envoie un message de fermeture avant sa terminaison de connexion. Si on reçoit ce code,
+        alors il faut fermer la connexion.
+On choisi de travailler avec la dernière option : le client envoie un message de terminaison de connexion. Cette option
+s'accorde avec le fait que de toute façon l'utilisateur à l'interface client fait trois choix : (1) envoyer un ficher;
+(2) récuperer un fichier, et (3) sortir.
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+Choix
+-------------------------------------------------------------------------------------------------------------------------------------------
+Des deux côtés client/serveur, les échanges sont divisés en trois partie : 
+    1. L'échange d'un fichier client -> serveur
+    2. L'échange d'un fichier serveur -> client
+    3. La sortie de la connexion.
+
+Ce choix est déterminé par l'utilisateur au niveau de l'interface client. Il est systématiquement envoyé au serveur
+à chaque début d'échange pour déterminer quel comportement le serveur doit avoir pour les prochains échanges. La connexion
+est conservée tant que le client n'a pas fait une demande de terminaison, c'est à dire qu'il a soit mal tapé son choix, soit
+fait le choix 3.
+

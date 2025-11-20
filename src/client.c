@@ -192,6 +192,7 @@ void client_appli (char *serveur,char *service)
 				// des fichiers envoyés. Comme ça, cela nous permet de ne pas envoyer une demande
 				// d'existance au serveur. Note : le fichier peut être existant mais pas ouvrable ni
 				// modifiable !
+				// Error : functions with substring of name !
 				printf("Veuillez fournir le nom de votre fichier.\n");
 				scanf("%s", full_file_name);
 				while ( strstr(file_system, full_file_name) == NULL ) {
