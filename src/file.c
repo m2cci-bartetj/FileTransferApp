@@ -44,23 +44,69 @@ int GetFileName(char * full_name, char * name) {
     //printf("length final name : %ld\n", strlen(name));
     printf("\n>>>>> DEBUG >>>>> \t GETFILENAME (fin)\n");
 
-    // Maybe a return to check that all is ok would be nice ?
-    return 1;
+    // All is well
+    return 0;
 }
 
 
 /*
 -----------------------------------------------------------------------------------------
-            int ReadFile(char * name, char ** content, int * size)
+            int GetFileSize(char * name, int * size)
 -----------------------------------------------------------------------------------------
-This function is used to read a file name 'name', and get its size and contents.
-It returns the nb of objects read. If < 1, then there is an error.
+This function is used to get the size of a given file.
+It returns the 0 if all is well, or errno if not.
 donnée : name
-résultat : size, contents
-/!\ contents is stored in an allocated space. Which means it MUST be freed as soon as possible.
+résultat : size
+Note : we could return the size +1 in order to add at the end of file_content the end mark '\0'.
+It is quite un-necessary UNLESS one wants to print the file contents using printf("%s").
+But this generally produces an error when opening with regular text editor the copied file,
+that is seen as binary.
 -----------------------------------------------------------------------------------------
 */
-int ReadFile(char * name, char ** content, int * size) {
+int GetFileSize(char * name, int * size) {
+	printf("\n>>>>> DEBUG >>>>> \t GETFILESIZE (debut)\n"); 
+    // Definitions
+	FILE * f;
+
+	// opening file
+    //printf("\n>>>>> DEBUG >>>>> \t opening file \n");
+	f = fopen(name, "rb");
+	if (f == NULL) {
+		perror("Erreur d'ouverture");
+		return errno;
+	};
+
+	// searching for file size : position at the end, get size
+    //printf("\n>>>>> DEBUG >>>>> \t searching for size \n");
+	if (fseek(f, 0, SEEK_END) != 0) {
+		perror("Erreur de positionnement en fin");
+		return errno;
+	};
+	//* size = (int) ftell(f) +1 ;
+    * size = (int) ftell(f) ;
+    
+    // All is well
+    printf(">>>>> DEBUG >>>>> \t GETFILESIZE (fin)\n");
+    return 0;
+
+}
+
+/*
+-----------------------------------------------------------------------------------------
+            int ReadFile(char * name, char ** content, int size)
+-----------------------------------------------------------------------------------------
+This function is used to read a file name 'name' of given size, and get its contents.
+It returns 0 if there are not errors. Else it retruns errno.
+donnée : name, size
+résultat : contents
+/!\ contents is stored in an allocated space. Which means it MUST be freed as soon as possible.
+Note : We cannot read file contents with a printf. Printf("%s", file_content) reads until mark '\0'.
+If it is not here, it continues to read beyond the variable into to non-allocated memory !
+If we usze size +1 and put it there, the copied filed is seen as binary and it not quite the
+same one as the original (\0 added at the end.)
+-----------------------------------------------------------------------------------------
+*/
+int ReadFile(char * name, char * content, int size) {
 	printf("\n>>>>> DEBUG >>>>> \t READFILE (debut)\n"); 
 
     // Definitions
@@ -71,48 +117,31 @@ int ReadFile(char * name, char ** content, int * size) {
     //printf("\n>>>>> DEBUG >>>>> \t opening file \n");
 	f = fopen(name, "rb");
 	if (f == NULL) {
-		perror("Erreur d'ouverture\n");
-		exit(2);
+		perror("Erreur d'ouverture");
+		return errno;
 	};
 
-	// searching for file size : position at the end, get size, reposition at the start.
-    //printf("\n>>>>> DEBUG >>>>> \t searching for size \n");
-	if (fseek(f, 0, SEEK_END) != 0) {
-		perror("Erreur de positionnement en fin\n");
-		exit(3);
-	};
-	* size = (int) ftell(f);
-    if (fseek(f, 0, SEEK_SET) != 0) {
-		perror("Erreur de positionnement en début\n");
-		exit(4);
-	};
-
-	// Creating buffer with correct size
-    //printf("\n>>>>> DEBUG >>>>> \t linking content to correct memory allocation\n");
-	*content = malloc(*size +1);
-    if (*content == NULL) {
-        perror("Erreur d'allocation de mémoire\n");
-		exit(5);
-    }
-
-	// Storing in buffer file (no checks if reads correct nb of objects)
+	// Storing in buffer file 
     //printf("\n>>>>> DEBUG >>>>> \t READFILE (reading file) size %d\n", *size);
-	nb_objects = fread(*content, *size, 1, f);
+	nb_objects = fread(content, size, 1, f);
     if (nb_objects < 1) {
-        perror("Erreur de lecture dans le flot\n");
-		exit(6);
+        perror("Erreur de lecture dans le flot");
+		return errno;
     };
+
+    // adding the end mark for useful printing only.
+    //content[size] = '\0';
 
     // Closing stream
     // printf("\n>>>>> DEBUG >>>>> \tREADFILE (closing file)\n");
     if (fclose(f) == EOF) {
-		perror("Erreur de fermeture du flot\n");
-		exit(7);
+		perror("Erreur de fermeture du flot");
+		return errno;
 	};
     
     // All is well
     printf(">>>>> DEBUG >>>>> \t READFILE (fin)\n");
-    return 1;
+    return 0;
 
 }
 
@@ -135,71 +164,28 @@ int WriteFile(char * name, int content_size, char * content) {
 	// Opening file in mode w. Warning, this destroys any existent file with the same name.
 	f = fopen(name, "wb");
 	if (f == NULL) {
-		perror("Erreur d'ouverture\n");
-		exit(2);
+		perror("Erreur d'ouverture");
+		return errno;
 	};
 
 	// Writing in file
     // int fwrite(void *t, int size, int nbel, FILE *fp);
 	nb_bytes = fwrite(content, 1, content_size, f);
     if (nb_bytes < content_size) {
-        perror("Erreur d'écriture dans le flot\n");
-		exit(8);
+        perror("Erreur d'écriture dans le flot");
+		return errno;
     };
 
     // Closing stream
     if (fclose(f) == EOF) {
-		perror("Erreur de fermeture du flot\n");
-		exit(7);
+		perror("Erreur de fermeture du flot");
+		return errno;
 	};
 
     // all is well
     printf(">>>>> DEBUG >>>>> \t WRITEFILE (fin)\n");
-    return 1;
+    return 0;
 
-}
-
-
-/*
------------------------------------------------------------------------------------------
-                         void CheckError(int error, int quit) 
------------------------------------------------------------------------------------------
-This function takes an error code, prints associated message, and exit if asked.
------------------------------------------------------------------------------------------
-*/
-void CheckError(int error, int quit) {
-    switch(error) {
-		case 1 :
-		    printf("No errors to report.\n");
-		    break;
-		case 2 :
-			printf("Erreur d'ouverture.\n");
-			break;
-		case '3' :
-			printf("Erreur de positionnement en fin.\n");
-			break;
-		case '4' :
-			printf("Erreur de positionnement en début.\n");
-			break;
-		case '5' :
-			printf("Erreur d'allocation de mémoire.\n");
-			break;
-		case '6' :
-			printf("Erreur de lecture dans le flot.\n");
-			break;
-		case '7' :
-			printf("Erreur de fermeture du flot.\n");
-			break;
-		case '8' :
-			printf("Erreur d'écriture dans le flot.\n");
-			break;
-		default :
-			printf("Not yet registered error.\n");
-			break;
-	};
-    if (quit) {
-        exit(EXIT_FAILURE);
-    };
 }
 
 
@@ -222,8 +208,8 @@ int GetFileSystem (char * output, const int size, const char * command) {
     
     // Open new flow
     if ((f = popen(command, "r")) == NULL) {
-		perror("Erreur d'ouverture\n");
-		exit(2);
+		perror("Erreur d'ouverture de processe");
+		return errno;
 	};
 
     // storing command response in file_system
@@ -231,10 +217,13 @@ int GetFileSystem (char * output, const int size, const char * command) {
 	//printf("output : \n %s\n", output);
     
     // Closing flow
-    pclose(f);
+    if (pclose(f) == -1) {
+        perror("Erreur de fermeture du flot");
+		return errno;
+    };
 
     // All is well
-    return 1;
+    return 0;
 
 }
 
