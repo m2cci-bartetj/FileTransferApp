@@ -114,11 +114,16 @@ void client_appli (char *serveur,char *service)
 	// 3.1 Choix de la procédure : envoyer ou récupérer un fichier ou sortir ?
 	choice = '0';
 	while (choice != '3') {
-		printf("\n Que voulez-vous faire : \n");
-		printf(" 1. Envoyer un fichier ? \n");
-		printf(" 2. Récupérer un fichier ? \n");
-		printf(" 3. Sortir sans rien faire ? \n");
-		printf("Tapez 1, 2 ou 3 : ");
+		printf("\n===============================\n");
+    	printf("   Bienvenue sur FileTransfer  \n");
+    	printf("===============================\n");
+    	printf("Que souhaitez-vous faire aujourd'hui ?\n\n");
+
+    	printf("[1] 📤 Envoyer un fichier\n");
+    	printf("[2] 📥 Récupérer un fichier\n");
+    	printf("[3] 🚪 Quitter l'application\n\n");
+
+    	printf("👉 Faites votre choix (1/2/3) : ");
 		//fflush(stdin);
 		scanf(" %c", &choice);
 		//fflush(stdin);
@@ -126,7 +131,7 @@ void client_appli (char *serveur,char *service)
 		switch(choice)
 		{
 			case '1' :
-				printf("\n Choix 1: envoyer un fichier client -> serveur.\n");
+				printf("\n Choix 1: 📤 Envoyer un fichier client -> serveur.\n");
 				// A noter que l'on ne dit pas où stocker ce fichier dans le serveur.
 				// Cela pourrait être une option supplémentaire. Par défault, ce sera
 				// donc dans le même répertoire que là où l'on lance ./serveur
@@ -210,7 +215,7 @@ void client_appli (char *serveur,char *service)
 				// Sortir pour le prochain choix.
 				break;
 			case '2' : 
-				printf("\n Choix 2: envoyer un fichier serveur -> client.\n");
+				printf("\n Choix 2: 📥 Récupérer un fichier serveur -> client.\n");
 				// Envoyer notre choix pour que le serveur nous envoie son répertoire courant
 				// jusqu'à inode donnée?
 				nb_bytes_written = h_writes(id_socket, &choice, 1);
@@ -285,7 +290,7 @@ void client_appli (char *serveur,char *service)
 				// Sortir pour le prochain choix.
 				break;
 			case '3' : 
-				printf("\nChoix 3: sortir sans rien faire.\n");
+				printf("\nChoix 3: 🚪 Quitter l'application\\n");
 				// Envoyer le choix au serveur. Verifier que le nb de bytes envoyés
 				// est correct. Sinon, recommencer. PAs sublime comme test d'erreur.
 				//do {
