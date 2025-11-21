@@ -151,7 +151,7 @@ int ReadFile(char * name, char * content, int size) {
 -----------------------------------------------------------------------------------------
 This function is used to write content of size content_size in a file of name name.
 Each input parameter is a donnée.
-Return : 1 if all is ok. Error code if not.
+Return : 0 if all is ok. Error code if not.
 -----------------------------------------------------------------------------------------
 */
 int WriteFile(char * name, int content_size, char * content) {

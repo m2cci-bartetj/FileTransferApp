@@ -103,13 +103,13 @@ Ce choix est déterminé par l'utilisateur au niveau de l'interface client. Il e
 est conservée tant que le client n'a pas fait une demande de terminaison, c'est à dire qu'il a soit mal tapé son choix, soit
 fait le choix 3.
 
-Au niveau de l'envoi d'entiers, on a décidé de ne pas convertir le chiffre en string (sinon on aurait des tables conséquentes
+Au niveau de l'envoi d'entiers, on a décidé de ne pas convertir le nombre en string (sinon on aurait des tables conséquentes
 pour les fichiers lourds), mais de stocker la valeur hexadécimale de l'entier dans un tableau de 5 char (5ième pour le charactère
 de fin de chaine '\0'). Comme ça, le transfer de cette donnée se fait en n'utilisant que 5 octets, au lieu d'autant que de chiffres
 si on avait fait une convertion int <-> string en utilisant les charactères ASCII.
 
 Au niveau des erreurs : on se concentre majoritairement sur les erreurs liées aux manipulations de fichiers et d'allocation de mémoire.
-On évite à tout prix d'avoir le serveur qui s'arrête ou ferme la connexion par lui même. Ainsi, la pertinance des informations
+On évite à tout prix d'avoir le serveur qui s'arrête ou ferme la connexion par lui même. Ainsi, la pertinence des informations
 reçues/envoyées dépend du code d'erreur final envoyé. Ce code d'erreur correspond à la dernière erreur rencontrée au niveau du serveur.
 Du côté client, si les erreurs sont faites avant l'envoi du choix, alors on sort du switch et on re-demande le choix. Si le choix a été
 envoyé, mais que la prochaine information lue par le serveur est le choix, alors on sort du switch, et on demande à l'utilisateur de

@@ -181,7 +181,7 @@ void serveur_appli(char *service)
 					// Envoyer la liste des fichiers du répertoire courant seulement.
 					// The command can be changed here if needed. Note that only files
 					// are given here, and should have the proper path if contained in a repertory.
-					error_code_serv = GetFileSystem(file_system, MAX_FILESYSTEM_SIZE, "find . -type f | sed 's|^./||'");
+					error_code_serv = GetFileSystem(file_system, MAX_FILESYSTEM_SIZE, "find . -type f | sed 's|^\./||'");
 					if (error_code_serv != 0) {
 						// send empty string in case of error. Initialising first slot to mark should be enough
 						file_system[0] = '\0';
