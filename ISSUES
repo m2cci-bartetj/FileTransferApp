@@ -42,9 +42,6 @@ the existences of the file name it wants to retrieve.
 10. Sending is done property by property for testing reasons. However, this is a loss of time since un-used padding must be 
 added to eah sent package. The heavier the property %1448, the better.
 
-11. Sequential server : it can treat only one client at a time. Multiple clients would be interesting => use fork().
->> DONE
-
-12. Problem with word search in string : any substring of main string works. We must format file system to have space at the
+11. Problem with word search in string : any substring of main string works. We must format file system to have space at the
 start and end of each file name. And add spaces on both sides of the file name given by the operator. Then check using same
 function.
