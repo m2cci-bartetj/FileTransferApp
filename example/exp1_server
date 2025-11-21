@@ -1,0 +1,114 @@
+spr-fall-clients-im2ag-129-88-209-117:~/Documents/R/TP4/FileTransferApp/server
+[14:18:31][130]bigeardg$ ls
+serveur  TESTME
+spr-fall-clients-im2ag-129-88-209-117:~/Documents/R/TP4/FileTransferApp/server
+[14:22:00]bigeardg$ ./serveur 
+defaut service = 1111
+
+>>>>> DEBUG >>>>>        H_SOCKET (debut) -------------------
+>>>>> DEBUG >>>>>        domaine : 2 mode : 1 
+>>>>> DEBUG >>>>>        H_SOCKET (fin) ----- socket 3 cree ---
+
+>>>>> DEBUG >>>>>        ADR_SOCKET (debut) .........
+>>>>> DEBUG >>>>>        adresse IPv4 : 0.0.0.0 OK..........
+>>>>> DEBUG >>>>>        port : 1111 OK .........
+>>>>> DEBUG >>>>>        ADR_SOCKET (fin) .........
+
+>>>>> DEBUG >>>>>       H_BIND (debut)
+>>>>> DEBUG >>>>>       socket : 3 
+>>>>> DEBUG >>>>>       adresse IP : 0.0.0.0 
+>>>>> DEBUG >>>>>       port : 1111 OK 
+>>>>> DEBUG >>>>>       port apres le bind: 1111 OK 
+>>>>> DEBUG >>>>>       H_BIND (fin)  
+
+>>>>> DEBUG >>>>>       H_LISTEN (debut) -------------------
+>>>>> DEBUG >>>>>       H_LISTEN (fin)
+
+>>>>> DEBUG >>>>>       H_ACCEPT (debut)
+>>>>> DEBUG >>>>>       H_ACCEPT (fin)
+
+>>>>> DEBUG >>>>>       H_READS (debut)         -------------------
+>>>>> DEBUG >>>>>       H_READS nb_octets : 1 
+>>>>> DEBUG >>>>>       H_READS apres read ..................
+>>>>> DEBUG >>>>>       H_READS nb octets lus: 1 
+>>>>> DEBUG >>>>>       H_READS (fin)   -------------------
+
+ Choix 1: envoyer un fichier client -> serveur.
+
+>>>>> DEBUG >>>>>       H_READS (debut)         -------------------
+>>>>> DEBUG >>>>>       H_READS nb_octets : 5 
+>>>>> DEBUG >>>>>       H_READS apres read ..................
+>>>>> DEBUG >>>>>       H_READS nb octets lus: 5 
+>>>>> DEBUG >>>>>       H_READS (fin)   -------------------
+size of file : 894 
+
+>>>>> DEBUG >>>>>       H_READS (debut)         -------------------
+>>>>> DEBUG >>>>>       H_READS nb_octets : 100 
+>>>>> DEBUG >>>>>       H_READS apres read ..................
+>>>>> DEBUG >>>>>       H_READS nb octets lus: 100 
+>>>>> DEBUG >>>>>       H_READS (fin)   -------------------
+Name of file : README2 
+
+>>>>> DEBUG >>>>>       H_READS (debut)         -------------------
+>>>>> DEBUG >>>>>       H_READS nb_octets : 894 
+>>>>> DEBUG >>>>>       H_READS apres read ..................
+>>>>> DEBUG >>>>>       H_READS nb octets lus: 894 
+>>>>> DEBUG >>>>>       H_READS (fin)   -------------------
+>>>>> DEBUG >>>>>        WRITEFILE (debut)
+>>>>> DEBUG >>>>>        WRITEFILE (fin)
+error code int 0
+
+>>>>> DEBUG >>>>>       H_WRITES (debut)        -------------------
+>>>>> DEBUG >>>>>       H_WRITES (fin)  -------------------
+nb bytes written for error 5
+
+>>>>> DEBUG >>>>>       H_READS (debut)         -------------------
+>>>>> DEBUG >>>>>       H_READS nb_octets : 1 
+>>>>> DEBUG >>>>>       H_READS apres read ..................
+>>>>> DEBUG >>>>>       H_READS nb octets lus: 1 
+>>>>> DEBUG >>>>>       H_READS (fin)   -------------------
+
+ Choix 2: envoyer un fichier serveur -> client.
+
+>>>>> DEBUG >>>>>       H_WRITES (debut)        -------------------
+>>>>> DEBUG >>>>>       H_WRITES (fin)  -------------------
+nb bytes written for file system 500
+
+>>>>> DEBUG >>>>>       H_READS (debut)         -------------------
+>>>>> DEBUG >>>>>       H_READS nb_octets : 100 
+>>>>> DEBUG >>>>>       H_READS apres read ..................
+>>>>> DEBUG >>>>>       H_READS nb octets lus: 100 
+>>>>> DEBUG >>>>>       H_READS (fin)   -------------------
+Name of file : TESTME 
+
+>>>>> DEBUG >>>>>        GETFILESIZE (debut)
+>>>>> DEBUG >>>>>        GETFILESIZE (fin)
+file size : 32
+>>>>> DEBUG >>>>>        READFILE (debut)
+>>>>> DEBUG >>>>>        READFILE (fin)
+
+>>>>> DEBUG >>>>>       H_WRITES (debut)        -------------------
+>>>>> DEBUG >>>>>       H_WRITES (fin)  -------------------
+nb bytes written for file size 5
+
+>>>>> DEBUG >>>>>       H_WRITES (debut)        -------------------
+>>>>> DEBUG >>>>>       H_WRITES (fin)  -------------------
+nb bytes written for file content 32
+
+>>>>> DEBUG >>>>>       H_WRITES (debut)        -------------------
+>>>>> DEBUG >>>>>       H_WRITES (fin)  -------------------
+nb bytes written for error 5
+
+>>>>> DEBUG >>>>>       H_READS (debut)         -------------------
+>>>>> DEBUG >>>>>       H_READS nb_octets : 1 
+>>>>> DEBUG >>>>>       H_READS apres read ..................
+>>>>> DEBUG >>>>>       H_READS nb octets lus: 1 
+>>>>> DEBUG >>>>>       H_READS (fin)   -------------------
+
+ Choix 3 : le client ferme la connexion.
+
+>>>>> DEBUG >>>>>        H_CLOSE (debut)
+>>>>> DEBUG >>>>>        H_CLOSE (fin)
+
+>>>>> DEBUG >>>>>       H_ACCEPT (debut)
+

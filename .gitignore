@@ -1,0 +1,12 @@
+# Fichiers compilés
+*.o
+*.out
+*.exe
+
+# Binaires de l'application
+client
+serveur
+
+# Sauvegardes temporaires
+*~
+*.swp

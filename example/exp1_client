@@ -1,0 +1,143 @@
+spr-fall-clients-im2ag-129-88-209-117:~/Documents/R/TP4/FileTransferApp/client
+[14:20:28]bigeardg$ ls
+client  README2
+spr-fall-clients-im2ag-129-88-209-117:~/Documents/R/TP4/FileTransferApp/client
+[14:21:57]bigeardg$ ./client 
+serveur par defaut: 127.0.0.1
+service par defaut: 1111
+
+>>>>> DEBUG >>>>>        H_SOCKET (debut) -------------------
+>>>>> DEBUG >>>>>        domaine : 2 mode : 1 
+>>>>> DEBUG >>>>>        H_SOCKET (fin) ----- socket 3 cree ---
+
+>>>>> DEBUG >>>>>        ADR_SOCKET (debut) .........
+>>>>> DEBUG >>>>>        adresse IPv4 : 127.0.0.1 OK..........
+>>>>> DEBUG >>>>>        port : 1111 OK .........
+>>>>> DEBUG >>>>>        ADR_SOCKET (fin) .........
+
+>>>>> DEBUG >>>>>       H_CONNECT (debut) -------------------
+>>>>> DEBUG >>>>>       socket : 3 
+>>>>> DEBUG >>>>>       adresse IP serveur: 127.0.0.1 
+>>>>> DEBUG >>>>>       port service : 1111 OK 
+>>>>> DEBUG >>>>>       H_CONNECT (fin) -------------------
+
+ Que voulez-vous faire : 
+ 1. Envoyer un fichier ? 
+ 2. Récupérer un fichier ? 
+ 3. Sortir sans rien faire ? 
+Tapez 1, 2 ou 3 : 1
+
+ Choix 1: envoyer un fichier client -> serveur.
+
+ Veuillez fournir le nom de votre fichier : README 
+Ce fichier n'existe pas. Veuillez entrer un nom correct : README2
+Full file name : README2
+
+>>>>> DEBUG >>>>>        GETFILENAME (debut)
+First name : README2
+Final name : README2
+
+>>>>> DEBUG >>>>>        GETFILENAME (fin)
+
+>>>>> DEBUG >>>>>        GETFILESIZE (debut)
+>>>>> DEBUG >>>>>        GETFILESIZE (fin)
+file size : 894
+>>>>> DEBUG >>>>>        READFILE (debut)
+>>>>> DEBUG >>>>>        READFILE (fin)
+
+>>>>> DEBUG >>>>>       H_WRITES (debut)        -------------------
+>>>>> DEBUG >>>>>       H_WRITES (fin)  -------------------
+nb bytes written for choice 1
+
+>>>>> DEBUG >>>>>       H_WRITES (debut)        -------------------
+>>>>> DEBUG >>>>>       H_WRITES (fin)  -------------------
+nb bytes written for file size 5
+
+>>>>> DEBUG >>>>>       H_WRITES (debut)        -------------------
+>>>>> DEBUG >>>>>       H_WRITES (fin)  -------------------
+nb bytes written for file name 100
+
+>>>>> DEBUG >>>>>       H_WRITES (debut)        -------------------
+>>>>> DEBUG >>>>>       H_WRITES (fin)  -------------------
+nb bytes written for file content 894
+
+>>>>> DEBUG >>>>>       H_READS (debut)         -------------------
+>>>>> DEBUG >>>>>       H_READS nb_octets : 5 
+>>>>> DEBUG >>>>>       H_READS apres read ..................
+>>>>> DEBUG >>>>>       H_READS nb octets lus: 5 
+>>>>> DEBUG >>>>>       H_READS (fin)   -------------------
+Le transfer de fichier c'est bien passé.
+
+ Que voulez-vous faire : 
+ 1. Envoyer un fichier ? 
+ 2. Récupérer un fichier ? 
+ 3. Sortir sans rien faire ? 
+Tapez 1, 2 ou 3 : 2
+
+ Choix 2: envoyer un fichier serveur -> client.
+
+>>>>> DEBUG >>>>>       H_WRITES (debut)        -------------------
+>>>>> DEBUG >>>>>       H_WRITES (fin)  -------------------
+nb bytes written for choice 1
+
+>>>>> DEBUG >>>>>       H_READS (debut)         -------------------
+>>>>> DEBUG >>>>>       H_READS nb_octets : 500 
+>>>>> DEBUG >>>>>       H_READS apres read ..................
+>>>>> DEBUG >>>>>       H_READS nb octets lus: 500 
+>>>>> DEBUG >>>>>       H_READS (fin)   -------------------
+
+Existing files : 
+TESTME
+README2
+
+Veuillez fournir le nom de votre fichier.
+ogjieth
+Ce fichier n'existe pas. Veuillez entrer un nom correct : TESTME
+Full file name : TESTME
+
+>>>>> DEBUG >>>>>       H_WRITES (debut)        -------------------
+>>>>> DEBUG >>>>>       H_WRITES (fin)  -------------------
+nb bytes written for file name 100
+
+>>>>> DEBUG >>>>>       H_READS (debut)         -------------------
+>>>>> DEBUG >>>>>       H_READS nb_octets : 5 
+>>>>> DEBUG >>>>>       H_READS apres read ..................
+>>>>> DEBUG >>>>>       H_READS nb octets lus: 5 
+>>>>> DEBUG >>>>>       H_READS (fin)   -------------------
+size of file : 32 
+
+>>>>> DEBUG >>>>>       H_READS (debut)         -------------------
+>>>>> DEBUG >>>>>       H_READS nb_octets : 32 
+>>>>> DEBUG >>>>>       H_READS apres read ..................
+>>>>> DEBUG >>>>>       H_READS nb octets lus: 32 
+>>>>> DEBUG >>>>>       H_READS (fin)   -------------------
+
+>>>>> DEBUG >>>>>       H_READS (debut)         -------------------
+>>>>> DEBUG >>>>>       H_READS nb_octets : 5 
+>>>>> DEBUG >>>>>       H_READS apres read ..................
+>>>>> DEBUG >>>>>       H_READS nb octets lus: 5 
+>>>>> DEBUG >>>>>       H_READS (fin)   -------------------
+L'envoi du fichier c'est bien passé.
+>>>>> DEBUG >>>>>        WRITEFILE (debut)
+>>>>> DEBUG >>>>>        WRITEFILE (fin)
+
+ Que voulez-vous faire : 
+ 1. Envoyer un fichier ? 
+ 2. Récupérer un fichier ? 
+ 3. Sortir sans rien faire ? 
+Tapez 1, 2 ou 3 : 3
+
+Choix 3: sortir sans rien faire.
+
+>>>>> DEBUG >>>>>       H_WRITES (debut)        -------------------
+>>>>> DEBUG >>>>>       H_WRITES (fin)  -------------------
+nb bytes written for exit 1
+
+>>>>> DEBUG >>>>>        H_CLOSE (debut)
+>>>>> DEBUG >>>>>        H_CLOSE (fin)
+spr-fall-clients-im2ag-129-88-209-117:~/Documents/R/TP4/FileTransferApp/client
+[14:22:50]bigeardg$ diff README2 ../server/README2 
+spr-fall-clients-im2ag-129-88-209-117:~/Documents/R/TP4/FileTransferApp/client
+[14:23:02]bigeardg$ diff TESTME ../server/TESTME 
+spr-fall-clients-im2ag-129-88-209-117:~/Documents/R/TP4/FileTransferApp/client
+[14:23:12]bigeardg$ 
