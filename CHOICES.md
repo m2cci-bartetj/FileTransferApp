@@ -1,8 +1,10 @@
+#
+
 Ce document fournit les choix qui ont été fait pour construire nos applications client/serveur.
 Vous trouverez le squelette des codes dans README.
 
 
-## 1. Objectifs
+## 1. Objectifs
 
 Notre application permet de transferer des fichiers d'un client vers un serveur et vice-versa. On souhaite : 
 
@@ -51,7 +53,7 @@ On suppose ici que l'on travaille sur un serveur parallèle : les requêtes sont
     - envoyer à régulièrement des messages pour s'assurer de leur bonne réception. Si il n'y a pas de messages d'erreur, alors la connexion exist encore.
     - supposer que le client envoie un message de fermeture avant sa terminaison de connexion. Si on reçoit ce code, alors il faut fermer la connexion.
 
-On choisi de travailler avec la dernière option : le client envoie un message de terminaison de connexion. Cette option
+3. On choisi de travailler avec la dernière option : le client envoie un message de terminaison de connexion. Cette option
 s'accorde avec le fait que de toute façon l'utilisateur à l'interface client fait trois choix : 
 - (1) envoyer un ficher;
 - (2) récuperer un fichier, 
