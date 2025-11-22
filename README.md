@@ -1,4 +1,4 @@
-# 📁 Application Client/Serveur de Transfert de Fichiers
+## 📁 Application Client/Serveur de Transfert de Fichiers
 
 Ce projet implémente une application **client/serveur de transfert de fichiers** au-dessus de **TCP**.  
 L’objectif est de permettre à plusieurs clients de se connecter à un serveur pour **envoyer** ou **récupérer** des fichiers, en respectant les notions vues en cours (sockets, TCP, gestion de connexion, fork…).
@@ -87,7 +87,7 @@ Nous utilisons **TCP**, car :
 
 ## 5. Compilation
 
-Depuis le dossier ```text src ``` :
+Depuis le dossier ``` src ``` :
 
 ```bash
 
