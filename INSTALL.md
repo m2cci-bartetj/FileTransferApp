@@ -7,7 +7,7 @@ Ce choix permet de garder une structure simple pour ce projet de petite envergur
 
 ---
 
-# 1. Cloner le dépot
+## 1. Cloner le dépot
 
 Commence par récupérer le projet en local avec `git clone` :
 
@@ -15,7 +15,7 @@ Commence par récupérer le projet en local avec `git clone` :
 git clone https://github.com/m2cci-bartetj/FileTransferApp.git
 
 ```
----
+
 
 ##  2. Compilation
 
@@ -25,7 +25,7 @@ Depuis la racine du projet, exécute :
 cd src
 make
 ```
----
+
 
 ## 3. Utilisation
 
@@ -56,4 +56,3 @@ Le client affiche alors un menu :
    2. récupérer un fichier depuis le serveur ;
    3. quitter (fermeture de la connexion).
 
----
