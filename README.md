@@ -78,9 +78,9 @@ Nous utilisons **TCP**, car :
 ├── client/      # répertoire de travail du client (fichiers à envoyer / reçus)
 ├── server/      # répertoire de travail du serveur (fichiers stockés côté serveur)
 ├── README.md    # documentation principale
-├── INSTALL      # instructions de compilation / installation détaillées
-├── CHOICES      # choix techniques détaillés
-└── ISSUES       # pistes d’amélioration / bugs connus
+├── INSTALL.md      # instructions de compilation / installation détaillées
+├── CHOICES.md      # choix techniques détaillés
+└── ISSUES.md       # pistes d’amélioration / bugs connus
 
 ```
 ---
