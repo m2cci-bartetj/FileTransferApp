@@ -1,4 +1,4 @@
-# Application Client/Serveur de Transfert de Fichiers
+# 📁 Application Client/Serveur de Transfert de Fichiers
 
 Ce projet implémente une application **client/serveur de transfert de fichiers** au-dessus de **TCP**.  
 L’objectif est de permettre à plusieurs clients de se connecter à un serveur pour **envoyer** ou **récupérer** des fichiers, en respectant les notions vues en cours (sockets, TCP, gestion de connexion, fork…).
@@ -81,3 +81,65 @@ Nous utilisons **TCP**, car :
 ├── INSTALL      # instructions de compilation / installation détaillées
 ├── CHOICES      # choix techniques détaillés
 └── ISSUES       # pistes d’amélioration / bugs connus
+
+```
+---
+
+## 5. Compilation
+
+Depuis le dossier ```text src ``` :
+
+```bash
+
+cd src
+make
+# ou gmake si nécessaire
+
+```
+
+Les exécutables générés peuvent ensuite être appelés depuis ``` client/ ``` et ``` server/ ```.
+
+--- 
+
+## 6. Utilisation
+
+### 6.1 Lancer le serveur
+
+```bash
+
+cd server
+./serveur
+
+```
+
+### 6.2 Lancer le serveur
+
+Dans un autre terminal : 
+
+```bash
+
+cd client
+./client
+
+```
+
+Le client affiche alors un menu :
+   1. envoyer un fichier au serveur ;
+   2. récupérer un fichier depuis le serveur ;
+   3. quitter (fermeture de la connexion).
+
+---
+
+## 7. Améliorations possibles
+
+- Gestion de très gros fichiers (envoi/lecture par blocs, sans tout charger en      mémoire).
+- Meilleure portabilité (gestion du boutisme, types entiers normalisés).
+- Interface utilisateur plus claire (messages, confirmations d’écrasement, etc.).
+- Gestion plus fine des erreurs et des cas limites côté serveur comme côté client.
+
+
+
+
+
+
+
