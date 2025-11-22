@@ -55,9 +55,9 @@ On suppose ici que l'on travaille sur un serveur parallèle : les requêtes sont
 
 3. On choisi de travailler avec la dernière option : le client envoie un message de terminaison de connexion. Cette option
 s'accorde avec le fait que de toute façon l'utilisateur à l'interface client fait trois choix : 
-- (1) envoyer un ficher;
-- (2) récuperer un fichier, 
-- (3) sortir.
+    - (1) envoyer un ficher;
+    - (2) récuperer un fichier, 
+    - (3) sortir.
 
 4. On suppose que toutes les machines ont les même taille d'entier INT, le même boutisme, et les mêmes codes d'erreur errno : on ne se préocupe pas de problèmes de compatibilité entre les machines.
 
