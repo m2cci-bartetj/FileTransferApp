@@ -32,9 +32,9 @@ Ce document présente les limites actuelles de l’application ainsi que des pro
 - Transférer les fichiers **par blocs**, idéalement par paquets multiples de **1448 octets** (taille optimale d’envoi TCP).
 - Créer des fonctions dédiées :
   - `ReadFile()` : lecture par blocs,
-  - `WriteFile()` : écriture progressive avec modes `wb` puis `ab`,
-  - `SizeFile()` : obtention indépendante de la taille d’un fichier.
-- Éviter `fseek` répétés en réalisant la lecture dans une boucle interne unique.
+  - `WriteFile()` : écriture progressive avec modes `wb` (écrasement) puis `ab` (ajout),
+  - `SizeFile()` : obtention indépendante de la taille d’un fichier. Possiblement non nécessaire en lisant le fichier par incréments jusqu'à `EOF`.
+- Éviter `fseek` répétés en réalisant la lecture et l'envoi de l'information dans une boucle interne à `ReadFile()` unique.
 
 ---
 
