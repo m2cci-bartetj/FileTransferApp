@@ -130,9 +130,73 @@ Le client affiche alors un menu :
 
 ---
 
-## 7. Améliorations possibles
+## 7. Squelette du code & Structure des échanges
 
-- Gestion de très gros fichiers (envoi/lecture par blocs, sans tout charger en      mémoire).
+Vous trouverez ci-dessous le squelette des deux codes client/serveur avec leur échanges respectifs.
+
+```text
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+CLIENT                                                              SERVEUR
+-------------------------------------------------------------------------------------------------------------------------------------------
+création d'une socket                                               création d'une socket
+                                                                    configuration de la socket
+                                                                    mise en écoute de la socket
+                                                                    attente d'une demande de connexion en boucle infty
+connexion et configuration de la socket                    >>>>>    acceptation de la connexion avec création d'une nouvelle socket.
+-------------------------------------------------------------------------------------------------------------------------------------------
+Echange de données :                                                Echange de données :
+choix = 0                                                           choix = 0
+tant que (choix != 3)                                               tant que (choix !=3)
+start tantque                                                       start tantque
+choix : 1. envoyer fichier client -> serveur                        choix = socket_lire choix envoyé par le client
+        2. envoyer fichier serveur -> client
+        3. sortir.
+switch (choix)                                                      switch (choix)
+*******************************************************************************************************************************************
+Choix 1 :                                                           Choix 1 : 
+récupérer nom du fichier                                            
+récupérer contenu du fichier et taille du fichier
+si erreur alors sortir du switch                   
+socket_envoyer choix + taille + nom + contenu               >>>>>   socket_lire taille + nom + contenu du fichier
+liberer contenu                                                     ecrire contenu dans un fichier <nom>
+imprimer erreurs possibles côté serveur                     <<<<<   envoyer code d'erreur
+*******************************************************************************************************************************************
+Choix 2 :                                                           Choix 2 : 
+socket_envoyer choix                                        >>>>>        
+socket_lire fichiers dans répertoire courant du serveur     <<<<<   socket_envoyer fichiers dans le répertoire courant. Si erreur, envoyer
+                                                                    une chaine vide.
+choisir un nom de fichier existant. Aucun choix n'est
+possible si on a reçu précédemment une chaine vide. On doit alors
+arrêter le code avec Ctrl+C sans prévenir le serveur.        
+socket_envoyer le nom du fichier                            >>>>>   socket_lire le nom du fichier
+                                                                    récuperer taille du fichier (si erreur taille = 1)
+                                                                    récuperer contenu (si erreur contenu = "")
+socket_lire taille + contenu du fichier                     <<<<<   socket_envoyer taille + contenu
+                                                                    liberer contenu
+imprimer erreurs possibles côté serveur                     <<<<<   envoyer code d'erreur (permet de savoir si contenu envoyé pertinant ou non)
+Si pas d'erreur, ecrire contenu dans fichier de nom choisi                                                             
+*******************************************************************************************************************************************
+Choix 3 :                                                           Choix 3 : 
+socket_envoyer choix                                        >>>>>   On sort naturellement avec la condition tantque
+*******************************************************************************************************************************************
+Choix defaut :                                                      Choix defaut : 
+socket_envoyer choix = 3                                    >>>>>   Normalement ne devrait pas exister. Au cas où, choix = 3
+*******************************************************************************************************************************************
+endtantque                                                          endtantque
+-------------------------------------------------------------------------------------------------------------------------------------------
+Fermer la connexion                                                 Fermer la connexion
+-------------------------------------------------------------------------------------------------------------------------------------------
+                                                                    Attendre une nouvelle connexion
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+```
+
+--- 
+
+## 8. Améliorations possibles
+
+- Gestion de très gros fichiers (envoi/lecture par blocs, sans tout charger en mémoire).
 - Meilleure portabilité (gestion du boutisme, types entiers normalisés).
 - Interface utilisateur plus claire (messages, confirmations d’écrasement, etc.).
 - Gestion plus fine des erreurs et des cas limites côté serveur comme côté client.
